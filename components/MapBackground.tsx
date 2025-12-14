@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 
 // Declare Leaflet on window
 declare global {
@@ -15,145 +15,141 @@ interface Props {
 }
 
 const BERLIN_CENTER = { lat: 52.5200, lng: 13.4050 };
+// Bounds to restrict the view to Berlin area
 const BERLIN_BOUNDS = [
   [52.3, 13.0], // South West
   [52.7, 13.8]  // North East
 ];
 
 export const MapBackground: React.FC<Props> = ({ isFocused, isIntro, coordinates, onHotspotClick }) => {
-  const mapContainerRef = useRef<HTMLDivElement>(null);
-  const mapInstanceRef = useRef<any>(null);
+  const mapRef = useRef<any>(null);
   const markerRef = useRef<any>(null);
 
-  // Initialize Leaflet Map
+  // Initialize Map
   useEffect(() => {
-    if (mapInstanceRef.current) return;
+    // Safety check for Leaflet
+    if (!window.L) {
+      console.error("Leaflet not loaded");
+      return;
+    }
 
-    const checkLeaflet = setInterval(() => {
-      if (window.L && mapContainerRef.current) {
-        clearInterval(checkLeaflet);
-        
-        try {
-          // Check if map is already initialized on this element (React strict mode edge case)
-          if (mapContainerRef.current._leaflet_id) return;
+    // Cleanup existing map if strict mode triggered double mount
+    if (mapRef.current) {
+      mapRef.current.remove();
+      mapRef.current = null;
+    }
 
-          const map = window.L.map(mapContainerRef.current, {
-            center: [BERLIN_CENTER.lat, BERLIN_CENTER.lng],
-            zoom: 13,
-            minZoom: 11,
-            zoomControl: false,
-            attributionControl: true,
-            scrollWheelZoom: false,
-            doubleClickZoom: false,
-            dragging: true, 
-            keyboard: false,
-            maxBounds: BERLIN_BOUNDS,
-            maxBoundsViscosity: 1.0,
-          });
+    // Ensure DOM element exists
+    const container = document.getElementById('map');
+    if (!container) return;
 
-          // Standard OpenStreetMap Tiles (High availability)
-          // We use CSS class 'map-tiles-invert' in index.html to turn this Dark & Brutalist
-          window.L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '&copy; OpenStreetMap contributors',
-            maxZoom: 19,
-            className: 'map-tiles' // Custom class for CSS targeting if needed
-          }).addTo(map);
+    // --- LEAFLET INITIALIZATION START ---
+    const map = window.L.map('map', {
+      center: [BERLIN_CENTER.lat, BERLIN_CENTER.lng],
+      zoom: 13,
+      minZoom: 12, // Restrict zoom out
+      zoomControl: false,
+      attributionControl: true,
+      maxBounds: BERLIN_BOUNDS, // Restrict panning
+      maxBoundsViscosity: 1.0,
+    });
 
-          mapInstanceRef.current = map;
-          
-          // Force layout recalculation
-          setTimeout(() => {
-             map.invalidateSize();
-          }, 500);
-        } catch (e) {
-          console.error("Leaflet init error:", e);
-        }
+    // Standard OSM Layer as requested
+    window.L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+      className: 'invert-tiles' // CSS class to invert colors
+    }).addTo(map);
+
+    mapRef.current = map;
+    // --- LEAFLET INITIALIZATION END ---
+
+    // Cleanup on unmount
+    return () => {
+      if (mapRef.current) {
+        mapRef.current.remove();
+        mapRef.current = null;
+        markerRef.current = null;
       }
-    }, 200);
-
-    return () => clearInterval(checkLeaflet);
+    };
   }, []);
 
-  // Handle Coordinates and Markers
+  // Handle Markers & Coordinates
   useEffect(() => {
-    const map = mapInstanceRef.current;
-    if (!map || !window.L) return;
+    const map = mapRef.current;
+    if (!map) return;
 
-    // Clean up old markers
+    // Remove old marker
     if (markerRef.current) {
       map.removeLayer(markerRef.current);
       markerRef.current = null;
     }
 
+    // Validate coordinates
     const hasValidCoords = coordinates && 
                            typeof coordinates.lat === 'number' && 
                            !isNaN(coordinates.lat);
 
     if (hasValidCoords) {
+      // Create Custom Brutalist Marker
       const customIcon = window.L.divIcon({
         className: 'bg-transparent',
         html: `
-          <div class="relative w-20 h-20 flex items-center justify-center -translate-x-1/2 -translate-y-1/2 cursor-pointer group">
-             <!-- Radar Ping -->
-             <div class="absolute inset-0 border-2 border-neon-magenta rounded-full opacity-0 animate-[ping_2s_ease-out_infinite]"></div>
-             <div class="absolute inset-2 border border-neon-magenta rounded-full opacity-0 animate-[ping_2s_ease-out_infinite_0.5s]"></div>
+          <div class="relative w-24 h-24 flex items-center justify-center -translate-x-1/2 -translate-y-1/2 cursor-pointer group pointer-events-auto">
+             <!-- Radar Ping Animation -->
+             <div class="absolute inset-0 border-2 border-neon-magenta rounded-full animate-[ping_2s_ease-out_infinite] opacity-70"></div>
+             <div class="absolute inset-4 border border-neon-magenta rounded-full animate-[ping_2s_ease-out_infinite_0.5s] opacity-50"></div>
              
-             <!-- Center Point -->
-             <div class="w-4 h-4 bg-neon-magenta rotate-45 group-hover:rotate-90 transition-transform duration-300 shadow-[0_0_10px_#ff00ff]"></div>
+             <!-- Core Point -->
+             <div class="absolute w-4 h-4 bg-neon-magenta transform rotate-45 group-hover:rotate-0 transition-all duration-300 shadow-[0_0_20px_#ff00ff] z-20"></div>
              
              <!-- Label -->
-             <div class="absolute bottom-full mb-2 bg-black border border-neon-magenta text-neon-magenta text-[9px] px-2 py-1 font-mono hidden group-hover:block whitespace-nowrap">
-                DATA_FOUND
+             <div class="absolute -top-8 bg-black text-neon-magenta border border-neon-magenta text-[10px] px-2 py-1 font-mono whitespace-nowrap z-50 shadow-lg">
+               DETECTED_SIGNAL
              </div>
           </div>
         `,
-        iconSize: [40, 40],
-        iconAnchor: [20, 20]
+        iconSize: [60, 60],
+        iconAnchor: [30, 30]
       });
 
       const marker = window.L.marker([coordinates!.lat, coordinates!.lng], { icon: customIcon }).addTo(map);
       
+      // Handle Click
       marker.on('click', (e: any) => {
-        window.event?.stopPropagation();
+        window.L.DomEvent.stopPropagation(e);
         onHotspotClick();
       });
-      
+
       markerRef.current = marker;
 
-      map.flyTo([coordinates!.lat, coordinates!.lng], 16, {
+      // Fly to location
+      map.flyTo([coordinates!.lat, coordinates!.lng], 16, { 
         duration: 2.5,
-        easeLinearity: 0.2
+        easeLinearity: 0.25
       });
     } else {
-      map.flyTo([BERLIN_CENTER.lat, BERLIN_CENTER.lng], 13, { duration: 2 });
+      // Reset view if no coordinates
+      map.flyTo([BERLIN_CENTER.lat, BERLIN_CENTER.lng], 13, { duration: 1.5 });
     }
   }, [coordinates, onHotspotClick]);
 
-  // Handle Zoom/Focus
+  // Handle Focus State (Zoom)
   useEffect(() => {
-    const map = mapInstanceRef.current;
+    const map = mapRef.current;
     if (!map) return;
-
-    const hasValidCoords = coordinates && 
-                           typeof coordinates.lat === 'number' && 
-                           !isNaN(coordinates.lat);
-
-    if (hasValidCoords) {
-      const targetZoom = isFocused ? 17 : 15;
-      map.setZoom(targetZoom); // Direct setZoom for stability
+    
+    if (isFocused) {
+        map.setZoom(17, { animate: true });
     }
-  }, [isFocused, coordinates]);
+  }, [isFocused]);
 
-  // CSS Class handles the visual inversion (White OSM -> Dark Brutalist)
   return (
     <div 
-       ref={mapContainerRef} 
-       className={`
-         absolute inset-0 w-full h-full z-0 map-tiles-invert
-         transition-opacity duration-1000
-         ${isIntro ? 'opacity-100 blur-[2px]' : 'opacity-100 blur-0'}
+       id="map" 
+       className={`absolute inset-0 w-full h-full z-0 transition-all duration-1000 ease-in-out
+         ${isIntro ? 'opacity-40 blur-[2px]' : 'opacity-100 blur-0'}
        `}
-       style={{ background: '#050505' }}
+       style={{ background: '#050505' }} // Dark background behind map
     />
   );
 };

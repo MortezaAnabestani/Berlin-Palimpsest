@@ -9,7 +9,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@100..800&family=Vazirmatn:wght@100..900&display=swap" rel="stylesheet">
     
-    <!-- Leaflet CSS and JS (No Integrity Check for reliability) -->
+    <!-- Leaflet CSS and JS -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
 
@@ -68,24 +68,30 @@
         opacity: 0.15;
       }
       
-      /* Invert map tiles for brutalist dark mode */
-      .map-tiles-invert .leaflet-tile-pane {
-        filter: invert(100%) hue-rotate(180deg) brightness(0.8) contrast(1.2) grayscale(100%);
+      /* 
+         MAP INVERSION FILTER
+         Inverts white OSM tiles to black.
+         White roads -> Black
+         Light Grey areas -> Dark Grey
+         Text -> Inverted colors
+      */
+      .invert-tiles {
+        filter: invert(100%) hue-rotate(180deg) contrast(1.2);
       }
       
       .leaflet-container {
-        background: #000 !important;
+        background: #050505 !important;
         font-family: 'JetBrains Mono', monospace !important;
       }
       .leaflet-control-attribution {
-        background: #000 !important;
-        color: #ff00ff !important;
+        background: rgba(0,0,0,0.8) !important;
+        color: #888 !important;
         font-family: monospace;
         font-size: 10px;
-        border-top: 1px solid #ff00ff;
+        border-top: 1px solid #333;
       }
       .leaflet-control-attribution a {
-        color: #fff !important;
+        color: #ff00ff !important;
         text-decoration: none;
       }
     </style>
