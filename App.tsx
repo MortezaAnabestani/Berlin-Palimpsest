@@ -10,15 +10,11 @@ const App: React.FC = () => {
   const [lang, setLang] = useState<Language>('en');
   const [content, setContent] = useState<NarrativeContent | null>(null);
   const [error, setError] = useState<string | null>(null);
-  
-  // New state for minimizing the narrative box
   const [isMinimized, setIsMinimized] = useState(false);
 
-  // Check for API Key (Still needed for Gemini, but not for Map)
   const apiKey = process.env.API_KEY || '';
   const hasKey = !!apiKey;
 
-  // Font class based on language
   const fontClass = lang === 'fa' ? 'font-persian' : 'font-mono';
   const dir = lang === 'fa' ? 'rtl' : 'ltr';
 
@@ -27,9 +23,8 @@ const App: React.FC = () => {
       alert("API KEY MISSING. Cannot generate narrative.");
       return;
     }
-    
     setMode('generating');
-    setIsMinimized(false); // Reset minimize state
+    setIsMinimized(false);
     setError(null);
     const theme = THEMES.find(t => t.id === themeId);
     
@@ -47,7 +42,6 @@ const App: React.FC = () => {
 
   const handleHotspotClick = () => {
     if (mode === 'reading' && isMinimized) {
-      // Restore the text box
       setIsMinimized(false);
     } 
   };
@@ -62,13 +56,12 @@ const App: React.FC = () => {
     setIsMinimized(false);
   };
 
-  // Determine if the map should be sharp and zoomed in
   const isMapFocused = (mode === 'reading' && isMinimized) || mode === 'revealed';
 
   return (
     <div className={`relative w-full h-screen flex flex-col ${dir} overflow-hidden bg-berlin-black text-berlin-white`}>
       
-      {/* Layer 0: The Base Reality (Map) - Now uses Leaflet (Free) */}
+      {/* Layer 0: The Base Reality (Map) */}
       <MapBackground 
         isIntro={mode === 'intro'}
         isFocused={isMapFocused} 
@@ -80,12 +73,12 @@ const App: React.FC = () => {
       <div className={`
         absolute inset-0 z-10 p-6 md:p-12 flex flex-col justify-between pointer-events-none
         transition-all duration-1000
-        ${(mode === 'revealed' || (mode === 'reading' && isMinimized)) ? 'bg-transparent backdrop-blur-none' : 'bg-berlin-black/60 backdrop-blur-sm'}
+        ${(mode === 'revealed' || (mode === 'reading' && isMinimized)) ? 'bg-transparent' : 'bg-berlin-black/30'}
       `}>
         
-        {/* Header / Meta Info */}
+        {/* Header */}
         <header className={`flex justify-between items-start pointer-events-auto transition-opacity duration-500 ${mode === 'revealed' ? 'opacity-0' : 'opacity-100'}`}>
-          <div className="border-l-4 border-neon-magenta pl-4 bg-berlin-black/20 backdrop-blur-sm p-2">
+          <div className="border-l-4 border-neon-magenta pl-4 bg-black/40 backdrop-blur-md p-2">
             <h1 className="text-2xl md:text-4xl font-black tracking-tighter uppercase leading-none text-shadow-neon">
               Berlin<br/>Palimpsest
             </h1>
@@ -97,7 +90,7 @@ const App: React.FC = () => {
               <button 
                 key={l}
                 onClick={() => setLang(l)}
-                className={`w-10 h-10 border-2 text-sm font-bold no-radius transition-colors ${lang === l ? 'bg-white text-black border-white' : 'border-gray-700 text-gray-500 hover:border-gray-500 bg-black/50'}`}
+                className={`w-10 h-10 border-2 text-sm font-bold no-radius transition-colors ${lang === l ? 'bg-white text-black border-white' : 'border-gray-700 text-gray-500 hover:border-gray-500 bg-black/80'}`}
               >
                 {l.toUpperCase()}
               </button>
@@ -108,9 +101,9 @@ const App: React.FC = () => {
         {/* MAIN CONTENT AREA */}
         <main className="flex-grow flex flex-col justify-center items-center pointer-events-auto max-w-4xl mx-auto w-full relative">
           
-          {/* INTRO MODE */}
+          {/* INTRO */}
           {mode === 'intro' && (
-            <div className="text-center space-y-8 animate-in fade-in zoom-in duration-500 p-8 bg-black/80 border border-gray-700 backdrop-blur-md shadow-2xl">
+            <div className="text-center space-y-8 animate-in fade-in zoom-in duration-500 p-8 bg-black/70 border border-gray-800 backdrop-blur-sm shadow-2xl">
               <p className={`text-xl md:text-2xl leading-relaxed max-w-2xl text-neon-magenta font-bold ${fontClass}`}>
                  {lang === 'en' && "The city is a text written by other texts over time."}
                  {lang === 'de' && "Die Stadt ist ein Text, der durch andere Texte überschrieben wird."}
@@ -128,37 +121,32 @@ const App: React.FC = () => {
             </div>
           )}
 
-          {/* SELECTION MODE */}
+          {/* SELECTION */}
           {mode === 'selection' && (
             <div className="w-full grid grid-cols-1 md:grid-cols-2 gap-4 animate-in slide-in-from-bottom-10 duration-500">
-               {error && <div className="col-span-full border-2 border-red-500 text-red-500 p-4 font-mono mb-4 bg-red-900/20">{error}</div>}
+               {error && <div className="col-span-full border-2 border-red-500 text-red-500 p-4 font-mono mb-4 bg-red-900/80">{error}</div>}
                <div className="col-span-full text-center mb-8">
-                  <h2 className="text-concrete text-sm uppercase tracking-[0.2em] mb-2 bg-black/80 inline-block px-4 py-1">
+                  <h2 className="text-concrete text-sm uppercase tracking-[0.2em] mb-2 bg-black px-4 py-1 border border-concrete inline-block">
                     {UI_TEXT.select[lang]}
                   </h2>
                </div>
                {THEMES.map(theme => (
-                 <BrutalistButton key={theme.id} onClick={() => handleThemeSelect(theme.id)} className="h-32 text-xl bg-black/80 hover:bg-white/10">
+                 <BrutalistButton key={theme.id} onClick={() => handleThemeSelect(theme.id)} className="h-32 text-xl bg-black/70 hover:bg-black/90 backdrop-blur-sm">
                    {theme.label[lang]}
                  </BrutalistButton>
                ))}
             </div>
           )}
 
-          {/* GENERATING MODE */}
+          {/* GENERATING */}
           {mode === 'generating' && (
-            <div className="flex flex-col items-center gap-4 bg-black/80 p-12 border border-neon-magenta">
+            <div className="flex flex-col items-center gap-4 bg-black/90 p-12 border border-neon-magenta z-50">
               <div className="w-16 h-16 border-4 border-t-neon-magenta border-r-transparent border-b-white border-l-transparent rounded-full animate-spin"></div>
               <p className="font-mono text-neon-magenta animate-pulse">{UI_TEXT.loading[lang]}</p>
-              <div className="font-mono text-xs text-concrete mt-4">
-                Accessing Google Knowledge Graph...<br/>
-                Triangulating Historical Coordinates...<br/>
-                Generating Literary Overlay...
-              </div>
             </div>
           )}
 
-          {/* READING MODE (The Overlay) */}
+          {/* READING */}
           {mode === 'reading' && content && (
             <div 
               className={`
@@ -169,18 +157,13 @@ const App: React.FC = () => {
                 ${fontClass}
               `}
             >
-              
-              {/* Decorative 'Paper' effect elements */}
               <div className="absolute -top-3 -left-3 w-6 h-6 bg-white z-20"></div>
               <div className="absolute -bottom-3 -right-3 w-6 h-6 bg-neon-magenta z-20"></div>
 
-              {/* Minimize Button */}
               <button 
                 onClick={() => setIsMinimized(true)}
                 className="absolute top-0 right-0 p-4 hover:bg-white hover:text-black transition-colors border-l border-b border-gray-800"
-                title="Minimize to Map"
               >
-                {/* Minus Icon */}
                 <div className="w-4 h-1 bg-current"></div>
               </button>
 
@@ -197,7 +180,6 @@ const App: React.FC = () => {
                  <p className="text-xs text-concrete uppercase tracking-widest animate-pulse">
                    {lang === 'en' ? 'LOCATION IDENTIFIED' : lang === 'de' ? 'STANDORT IDENTIFIZIERT' : 'موقعیت شناسایی شد'}
                  </p>
-                 
                  <BrutalistButton onClick={handleRevealClick} className="w-full md:w-auto text-sm bg-neon-magenta/10 border-neon-magenta hover:bg-neon-magenta">
                    {UI_TEXT.reveal[lang]}
                  </BrutalistButton>
@@ -208,51 +190,42 @@ const App: React.FC = () => {
         </main>
 
         <footer className="pointer-events-auto h-12 flex items-end justify-between w-full">
-           {/* Footer decorative text */}
-           <span className="font-mono text-[10px] text-gray-500 bg-black/80 px-2">APP_V.1.0 // PALIMPSEST_ENGINE</span>
+           <span className="font-mono text-[10px] text-gray-400 bg-black/80 px-2 border border-gray-800">APP_V.1.0 // PALIMPSEST_ENGINE</span>
            
-           {/* Hint when minimized */}
            {isMinimized && mode === 'reading' && (
-             <span className="animate-bounce font-mono text-neon-magenta bg-black px-2 text-xs mr-4 mb-4 border border-neon-magenta">
+             <span className="animate-bounce font-mono text-neon-magenta bg-black px-2 text-xs mr-4 mb-4 border border-neon-magenta shadow-[4px_4px_0_0_#fff]">
                {lang === 'en' ? 'TAP TARGET TO RESTORE' : lang === 'de' ? 'ZIEL ANTIPPEN ZUM WIEDERHERSTELLEN' : 'برای بازگرداندن روی هدف بزنید'}
              </span>
            )}
         </footer>
       </div>
 
-      {/* Layer 2: The Truth (Revealed State Overlay) */}
-      {/* This allows the map to be seen clearly, but puts the hard fact in a rigid box */}
+      {/* Layer 2: The Truth (Revealed) */}
       {mode === 'revealed' && content && (
-        <div className="absolute inset-0 z-30 pointer-events-none flex items-center justify-center p-6 bg-black/50 backdrop-blur-sm">
-           {/* Back Button */}
+        <div className="absolute inset-0 z-30 pointer-events-none flex items-center justify-center p-6 bg-black/20 backdrop-blur-[2px]">
            <div className="absolute top-6 right-6 pointer-events-auto">
-              <BrutalistButton onClick={handleReset} className="bg-black/80 backdrop-blur-md border-neon-magenta text-sm py-2 px-4">
+              <BrutalistButton onClick={handleReset} className="bg-black border-neon-magenta text-sm py-2 px-4 shadow-[4px_4px_0_0_#ff00ff]">
                 {UI_TEXT.back[lang]}
               </BrutalistButton>
            </div>
 
-           {/* The Documentary Evidence Box */}
            <div className={`
               pointer-events-auto max-w-2xl w-full bg-berlin-white text-berlin-black p-8 
               border-l-8 border-neon-magenta shadow-2xl
               animate-in fade-in zoom-in-95 duration-700
               ${fontClass}
            `}>
-              <div className="flex items-center gap-4 mb-4">
+              <div className="flex items-center gap-4 mb-4 border-b-2 border-black pb-2">
                 <span className="bg-black text-white px-2 py-1 font-mono text-xs">{UI_TEXT.factLabel[lang]}</span>
-                <span className="font-bold text-neon-magenta">{content.year}</span>
+                <span className="font-bold text-neon-magenta text-xl">{content.year}</span>
               </div>
               
               <p className="text-xl md:text-2xl font-bold leading-tight">
                 {content.historicalFact}
               </p>
 
-              <div className="mt-6 flex gap-2 font-mono text-[10px] text-gray-500 uppercase">
-                <span>LAT: {content.coordinates.lat}</span>
-                <span>//</span>
-                <span>LNG: {content.coordinates.lng}</span>
-                <span>//</span>
-                <span>SRC: GOOGLE_KNOWLEDGE</span>
+              <div className="mt-6 flex gap-2 font-mono text-[10px] text-gray-500 uppercase bg-gray-200 p-2 inline-block">
+                 COORDINATES: {content.coordinates.lat.toFixed(4)}, {content.coordinates.lng.toFixed(4)}
               </div>
            </div>
         </div>

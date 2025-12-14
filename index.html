@@ -9,9 +9,9 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@100..800&family=Vazirmatn:wght@100..900&display=swap" rel="stylesheet">
     
-    <!-- Leaflet CSS and JS (CDNJS) -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css" integrity="sha512-Zcn6bjR/8RZbLEpLIeOwNtzREBAJnUKESxces60Mpoj+2okopSAcSUIUOseddDm0cxnGQzxIR7vJgsLZbdLE3w==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js" integrity="sha512-BwHfrr4c9kmRkLw6iXFdzcdWV/PGkVgiIyIWLLlTSXzWQzxuSg4DiQUCpauz/EWjgk5TYQqX/nyHGfoLDGFK8g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <!-- Leaflet CSS and JS (No Integrity Check for reliability) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
 
     <script>
       tailwind.config = {
@@ -45,9 +45,8 @@
       body {
         background-color: #050505;
         color: #f0f0f0;
-        overflow: hidden; /* Prevent scrolling, app-like feel */
+        overflow: hidden; 
       }
-      /* Brutalist Scrollbar */
       ::-webkit-scrollbar {
         width: 12px;
         background: #000;
@@ -68,18 +67,26 @@
         z-index: 50;
         opacity: 0.15;
       }
-      /* Map specific overrides */
+      
+      /* Invert map tiles for brutalist dark mode */
+      .map-tiles-invert .leaflet-tile-pane {
+        filter: invert(100%) hue-rotate(180deg) brightness(0.8) contrast(1.2) grayscale(100%);
+      }
+      
       .leaflet-container {
-        background: #111 !important;
+        background: #000 !important;
         font-family: 'JetBrains Mono', monospace !important;
       }
       .leaflet-control-attribution {
-        background: rgba(0,0,0,0.8) !important;
-        color: #666 !important;
-        font-size: 9px !important;
+        background: #000 !important;
+        color: #ff00ff !important;
+        font-family: monospace;
+        font-size: 10px;
+        border-top: 1px solid #ff00ff;
       }
       .leaflet-control-attribution a {
-        color: #888 !important;
+        color: #fff !important;
+        text-decoration: none;
       }
     </style>
   <script type="importmap">
