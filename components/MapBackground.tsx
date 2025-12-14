@@ -1,11 +1,6 @@
 import React, { useEffect, useRef } from 'react';
-
-// Declare Leaflet on window
-declare global {
-  interface Window {
-    L: any;
-  }
-}
+import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
 
 interface Props {
   isFocused: boolean;
@@ -27,12 +22,6 @@ export const MapBackground: React.FC<Props> = ({ isFocused, isIntro, coordinates
 
   // Initialize Map
   useEffect(() => {
-    // Safety check for Leaflet
-    if (!window.L) {
-      console.error("Leaflet not loaded");
-      return;
-    }
-
     // Cleanup existing map if strict mode triggered double mount
     if (mapRef.current) {
       mapRef.current.remove();
@@ -44,7 +33,7 @@ export const MapBackground: React.FC<Props> = ({ isFocused, isIntro, coordinates
     if (!container) return;
 
     // --- LEAFLET INITIALIZATION START ---
-    const map = window.L.map('map', {
+    const map = L.map('map', {
       center: [BERLIN_CENTER.lat, BERLIN_CENTER.lng],
       zoom: 13,
       minZoom: 12, // Restrict zoom out
@@ -55,7 +44,7 @@ export const MapBackground: React.FC<Props> = ({ isFocused, isIntro, coordinates
     });
 
     // Standard OSM Layer as requested
-    window.L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
       className: 'invert-tiles' // CSS class to invert colors
     }).addTo(map);
@@ -91,17 +80,17 @@ export const MapBackground: React.FC<Props> = ({ isFocused, isIntro, coordinates
 
     if (hasValidCoords) {
       // Create Custom Brutalist Marker
-      const customIcon = window.L.divIcon({
+      const customIcon = L.divIcon({
         className: 'bg-transparent',
         html: `
           <div class="relative w-24 h-24 flex items-center justify-center -translate-x-1/2 -translate-y-1/2 cursor-pointer group pointer-events-auto">
              <!-- Radar Ping Animation -->
              <div class="absolute inset-0 border-2 border-neon-magenta rounded-full animate-[ping_2s_ease-out_infinite] opacity-70"></div>
              <div class="absolute inset-4 border border-neon-magenta rounded-full animate-[ping_2s_ease-out_infinite_0.5s] opacity-50"></div>
-             
+
              <!-- Core Point -->
              <div class="absolute w-4 h-4 bg-neon-magenta transform rotate-45 group-hover:rotate-0 transition-all duration-300 shadow-[0_0_20px_#ff00ff] z-20"></div>
-             
+
              <!-- Label -->
              <div class="absolute -top-8 bg-black text-neon-magenta border border-neon-magenta text-[10px] px-2 py-1 font-mono whitespace-nowrap z-50 shadow-lg">
                DETECTED_SIGNAL
@@ -112,11 +101,11 @@ export const MapBackground: React.FC<Props> = ({ isFocused, isIntro, coordinates
         iconAnchor: [30, 30]
       });
 
-      const marker = window.L.marker([coordinates!.lat, coordinates!.lng], { icon: customIcon }).addTo(map);
-      
+      const marker = L.marker([coordinates!.lat, coordinates!.lng], { icon: customIcon }).addTo(map);
+
       // Handle Click
       marker.on('click', (e: any) => {
-        window.L.DomEvent.stopPropagation(e);
+        L.DomEvent.stopPropagation(e);
         onHotspotClick();
       });
 
