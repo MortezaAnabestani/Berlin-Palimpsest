@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>BERLIN PALIMPSEST</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@100..800&family=Vazirmatn:wght@100..900&display=swap" rel="stylesheet">
+    
+    <!-- Leaflet CSS and JS (CDNJS) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css" integrity="sha512-Zcn6bjR/8RZbLEpLIeOwNtzREBAJnUKESxces60Mpoj+2okopSAcSUIUOseddDm0cxnGQzxIR7vJgsLZbdLE3w==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js" integrity="sha512-BwHfrr4c9kmRkLw6iXFdzcdWV/PGkVgiIyIWLLlTSXzWQzxuSg4DiQUCpauz/EWjgk5TYQqX/nyHGfoLDGFK8g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              'berlin-black': '#050505',
+              'berlin-white': '#f0f0f0',
+              'neon-magenta': '#ff00ff',
+              'concrete': '#808080',
+            },
+            fontFamily: {
+              mono: ['"JetBrains Mono"', 'monospace'],
+              persian: ['"Vazirmatn"', 'sans-serif'],
+            },
+            animation: {
+              'pulse-fast': 'pulse 1s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+              'glitch': 'glitch 0.2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+            },
+            keyframes: {
+              glitch: {
+                '0%, 100%': { opacity: 1 },
+                '50%': { opacity: 0.8, transform: 'translateX(2px)' },
+              }
+            }
+          },
+        },
+      }
+    </script>
+    <style>
+      body {
+        background-color: #050505;
+        color: #f0f0f0;
+        overflow: hidden; /* Prevent scrolling, app-like feel */
+      }
+      /* Brutalist Scrollbar */
+      ::-webkit-scrollbar {
+        width: 12px;
+        background: #000;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: #ff00ff;
+        border: 2px solid #000;
+      }
+      .no-radius {
+        border-radius: 0px !important;
+      }
+      .scanline {
+        background: linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,0) 50%, rgba(0,0,0,0.2) 50%, rgba(0,0,0,0.2));
+        background-size: 100% 4px;
+        position: fixed;
+        top: 0; left: 0; right: 0; bottom: 0;
+        pointer-events: none;
+        z-index: 50;
+        opacity: 0.15;
+      }
+      /* Map specific overrides */
+      .leaflet-container {
+        background: #111 !important;
+        font-family: 'JetBrains Mono', monospace !important;
+      }
+      .leaflet-control-attribution {
+        background: rgba(0,0,0,0.8) !important;
+        color: #666 !important;
+        font-size: 9px !important;
+      }
+      .leaflet-control-attribution a {
+        color: #888 !important;
+      }
+    </style>
+  <script type="importmap">
+{
+  "imports": {
+    "react/": "https://esm.sh/react@^19.2.3/",
+    "react": "https://esm.sh/react@^19.2.3",
+    "react-dom/": "https://esm.sh/react-dom@^19.2.3/",
+    "@google/genai": "https://esm.sh/@google/genai@^1.33.0"
+  }
+}
+</script>
+</head>
+  <body>
+    <div id="root"></div>
+    <div class="scanline"></div>
+  </body>
+</html>
