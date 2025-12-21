@@ -40,8 +40,6 @@ I design and build backend systems, developer tools, and data-driven features. I
 (Replace the placeholders below with your favorite repositories — include short 1‑line descriptions and links.)
 
 - [Berlin-Palimpsest](https://github.com/MortezaAnabestani/Berlin-Palimpsest) — A personal collection of notes, maps, and experiments inspired by Berlin (this repo).  
-- [project-name-1](https://github.com/MortezaAnabestani/project-name-1) — One-sentence description of what it does and why it matters.  
-- [project-name-2](https://github.com/MortezaAnabestani/project-name-2) — One-sentence description; highlight a technical achievement or learning.
 
 ---
 
@@ -59,16 +57,6 @@ I’m open to:
 - Mentoring engineers learning systems & backend design
 
 If you're curious about working together, reach out!
-
----
-
-## Connect with me
-(Please replace these with your actual links)
-- Website / Portfolio: [your-website.com](https://your-website.com)  
-- Email: your.email@example.com  
-- Twitter: [@yourhandle](https://twitter.com/yourhandle)  
-- LinkedIn: [Your Name](https://www.linkedin.com/in/yourprofile)  
-- Mastodon: [@your@instance](https://your.instance/@your)  
 
 ---
 
