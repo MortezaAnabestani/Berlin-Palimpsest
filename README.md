@@ -69,4 +69,4 @@ This README is a starting template designed to be concise, welcoming, and action
 
 ---
 
-Thanks for reading — if you want, I can commit this README into your repository, or refine it with your personal details. What would you like me to update next?
+Thanks for reading 
